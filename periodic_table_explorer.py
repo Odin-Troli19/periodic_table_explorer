@@ -1,3 +1,11 @@
+"""
+Periodic Table Explorer
+
+An interactive application to explore chemical elements with multilingual support
+for English, Portuguese, and Norwegian. Displays detailed information about
+each element including properties, discovery, and color-coded categories.
+"""
+
 import tkinter as tk
 from tkinter import ttk, messagebox
 import json
@@ -10,214 +18,80 @@ class PeriodicTableExplorer:
         
         # Define element colors by category
         self.element_colors = {
-            "alkali metal": "#ff6666",
-            "alkaline earth metal": "#ffdead",
-            "transition metal": "#ffc0c0",
-            "post-transition metal": "#cccccc",
-            "metalloid": "#cccc99",
-            "nonmetal": "#a0ffa0",
-            "halogen": "#ffff99",
-            "noble gas": "#c0ffff",
-            "lanthanide": "#ffbfff",
-            "actinide": "#ff99cc"
+            "alkali metal": "#ff6666",           # Red
+            "alkaline earth metal": "#ffdead",    # Peach
+            "transition metal": "#ffc0c0",        # Pink
+            "post-transition metal": "#cccccc",   # Gray
+            "metalloid": "#cccc99",               # Khaki
+            "nonmetal": "#a0ffa0",                # Light green
+            "halogen": "#ffff99",                 # Light yellow
+            "noble gas": "#c0ffff",               # Light cyan
+            "lanthanide": "#ffbfff",              # Light purple
+            "actinide": "#ff99cc"                 # Light pink
         }
         
-        # Load element data
+        # Load element data from the separate module
         self.elements = self.load_element_data()
         
         # Create GUI
         self.create_widgets()
     
     def load_element_data(self):
-        # This is our element data with English, Portuguese, and Norwegian names
-        elements_data = {
-            "1": {
-                "symbol": "H",
-                "names": {
-                    "en": "Hydrogen",
-                    "pt": "Hidrogênio",
-                    "no": "Hydrogen"
+        """
+        Load element data from the element_data module.
+        Falls back to a minimal dataset if the module is not found.
+        """
+        try:
+            # Try to import from the element_data module
+            from element_data import elements_data
+            return elements_data
+        except ImportError:
+            # Fallback to minimal data if the import fails
+            print("Warning: element_data.py not found, using minimal dataset")
+            return {
+                "1": {
+                    "symbol": "H",
+                    "names": {
+                        "en": "Hydrogen",
+                        "pt": "Hidrogênio",
+                        "no": "Hydrogen"
+                    },
+                    "atomic_number": 1,
+                    "atomic_mass": 1.008,
+                    "category": "nonmetal",
+                    "electron_configuration": "1s¹",
+                    "electronegativity": 2.20,
+                    "density": 0.00008988,
+                    "melting_point": 14.01,
+                    "boiling_point": 20.28,
+                    "discovered_by": "Henry Cavendish",
+                    "year_discovered": 1766
                 },
-                "atomic_number": 1,
-                "atomic_mass": 1.008,
-                "category": "nonmetal",
-                "electron_configuration": "1s¹",
-                "electronegativity": 2.20,
-                "density": 0.00008988,
-                "melting_point": 14.01,
-                "boiling_point": 20.28,
-                "discovered_by": "Henry Cavendish",
-                "year_discovered": 1766
-            },
-            "2": {
-                "symbol": "He",
-                "names": {
-                    "en": "Helium",
-                    "pt": "Hélio",
-                    "no": "Helium"
-                },
-                "atomic_number": 2,
-                "atomic_mass": 4.0026,
-                "category": "noble gas",
-                "electron_configuration": "1s²",
-                "electronegativity": None,
-                "density": 0.0001785,
-                "melting_point": 0.95,
-                "boiling_point": 4.22,
-                "discovered_by": "Pierre Janssen, Norman Lockyer",
-                "year_discovered": 1868
-            },
-            "3": {
-                "symbol": "Li",
-                "names": {
-                    "en": "Lithium",
-                    "pt": "Lítio",
-                    "no": "Litium"
-                },
-                "atomic_number": 3,
-                "atomic_mass": 6.94,
-                "category": "alkali metal",
-                "electron_configuration": "1s² 2s¹",
-                "electronegativity": 0.98,
-                "density": 0.534,
-                "melting_point": 453.69,
-                "boiling_point": 1615,
-                "discovered_by": "Johan August Arfwedson",
-                "year_discovered": 1817
-            },
-            "4": {
-                "symbol": "Be",
-                "names": {
-                    "en": "Beryllium",
-                    "pt": "Berílio",
-                    "no": "Beryllium"
-                },
-                "atomic_number": 4,
-                "atomic_mass": 9.0122,
-                "category": "alkaline earth metal",
-                "electron_configuration": "1s² 2s²",
-                "electronegativity": 1.57,
-                "density": 1.85,
-                "melting_point": 1560,
-                "boiling_point": 2742,
-                "discovered_by": "Louis Nicolas Vauquelin",
-                "year_discovered": 1798
-            },
-            "5": {
-                "symbol": "B",
-                "names": {
-                    "en": "Boron",
-                    "pt": "Boro",
-                    "no": "Bor"
-                },
-                "atomic_number": 5,
-                "atomic_mass": 10.81,
-                "category": "metalloid",
-                "electron_configuration": "1s² 2s² 2p¹",
-                "electronegativity": 2.04,
-                "density": 2.34,
-                "melting_point": 2349,
-                "boiling_point": 4200,
-                "discovered_by": "Joseph Louis Gay-Lussac, Louis Jacques Thénard",
-                "year_discovered": 1808
-            },
-            "6": {
-                "symbol": "C",
-                "names": {
-                    "en": "Carbon",
-                    "pt": "Carbono",
-                    "no": "Karbon"
-                },
-                "atomic_number": 6,
-                "atomic_mass": 12.011,
-                "category": "nonmetal",
-                "electron_configuration": "1s² 2s² 2p²",
-                "electronegativity": 2.55,
-                "density": 2.267,
-                "melting_point": 3823,
-                "boiling_point": 4300,
-                "discovered_by": "Ancient civilizations",
-                "year_discovered": None
-            },
-            "7": {
-                "symbol": "N",
-                "names": {
-                    "en": "Nitrogen",
-                    "pt": "Nitrogênio",
-                    "no": "Nitrogen"
-                },
-                "atomic_number": 7,
-                "atomic_mass": 14.007,
-                "category": "nonmetal",
-                "electron_configuration": "1s² 2s² 2p³",
-                "electronegativity": 3.04,
-                "density": 0.001251,
-                "melting_point": 63.15,
-                "boiling_point": 77.36,
-                "discovered_by": "Daniel Rutherford",
-                "year_discovered": 1772
-            },
-            "8": {
-                "symbol": "O",
-                "names": {
-                    "en": "Oxygen",
-                    "pt": "Oxigênio",
-                    "no": "Oksygen"
-                },
-                "atomic_number": 8,
-                "atomic_mass": 15.999,
-                "category": "nonmetal",
-                "electron_configuration": "1s² 2s² 2p⁴",
-                "electronegativity": 3.44,
-                "density": 0.001429,
-                "melting_point": 54.36,
-                "boiling_point": 90.20,
-                "discovered_by": "Carl Wilhelm Scheele, Joseph Priestley",
-                "year_discovered": 1774
-            },
-            "9": {
-                "symbol": "F",
-                "names": {
-                    "en": "Fluorine",
-                    "pt": "Flúor",
-                    "no": "Fluor"
-                },
-                "atomic_number": 9,
-                "atomic_mass": 18.998,
-                "category": "halogen",
-                "electron_configuration": "1s² 2s² 2p⁵",
-                "electronegativity": 3.98,
-                "density": 0.001696,
-                "melting_point": 53.53,
-                "boiling_point": 85.03,
-                "discovered_by": "André-Marie Ampère, Humphry Davy",
-                "year_discovered": 1810
-            },
-            "10": {
-                "symbol": "Ne",
-                "names": {
-                    "en": "Neon",
-                    "pt": "Neônio",
-                    "no": "Neon"
-                },
-                "atomic_number": 10,
-                "atomic_mass": 20.180,
-                "category": "noble gas",
-                "electron_configuration": "1s² 2s² 2p⁶",
-                "electronegativity": None,
-                "density": 0.0008999,
-                "melting_point": 24.56,
-                "boiling_point": 27.07,
-                "discovered_by": "William Ramsay, Morris Travers",
-                "year_discovered": 1898
+                # Add a few more elements to allow the program to run with minimal data
+                "2": {
+                    "symbol": "He",
+                    "names": {
+                        "en": "Helium",
+                        "pt": "Hélio",
+                        "no": "Helium"
+                    },
+                    "atomic_number": 2,
+                    "atomic_mass": 4.0026,
+                    "category": "noble gas",
+                    "electron_configuration": "1s²",
+                    "electronegativity": None,
+                    "density": 0.0001785,
+                    "melting_point": 0.95,
+                    "boiling_point": 4.22,
+                    "discovered_by": "Pierre Janssen, Norman Lockyer",
+                    "year_discovered": 1868
+                }
             }
-            # Add more elements here - In a real application, you'd include all 118 elements
-            # You would continue the pattern for elements 11-118
-        }
-        
-        return elements_data
     
     def create_widgets(self):
+        """
+        Create all GUI widgets and layout for the application.
+        """
         # Create main frame
         main_frame = ttk.Frame(self.root, padding="10")
         main_frame.pack(fill=tk.BOTH, expand=True)
@@ -297,6 +171,9 @@ class PeriodicTableExplorer:
         self.update_element_list()
     
     def update_element_list(self):
+        """
+        Update the element listbox based on current language and search filter.
+        """
         self.element_listbox.delete(0, tk.END)
         language = self.language_var.get()
         search_text = self.search_var.get().lower()
@@ -310,6 +187,9 @@ class PeriodicTableExplorer:
                 self.element_listbox.insert(tk.END, display_text)
     
     def show_element_details(self, event):
+        """
+        Display detailed information about the selected element.
+        """
         selection = self.element_listbox.curselection()
         if not selection:
             return
@@ -351,6 +231,7 @@ class PeriodicTableExplorer:
             f"Electron Configuration: {element_data['electron_configuration']}",
         ]
         
+        # Handle potential None for electronegativity
         if element_data['electronegativity']:
             details.append(f"Electronegativity: {element_data['electronegativity']}")
         else:
@@ -368,6 +249,9 @@ class PeriodicTableExplorer:
         self.details_text.config(state=tk.DISABLED)
     
     def export_data(self):
+        """
+        Export all element data to a JSON file.
+        """
         try:
             with open("periodic_table_data.json", "w", encoding="utf-8") as f:
                 json.dump(self.elements, f, ensure_ascii=False, indent=4)
@@ -375,12 +259,7 @@ class PeriodicTableExplorer:
         except Exception as e:
             messagebox.showerror("Export Failed", f"Error exporting data: {str(e)}")
 
-# Add more elements function to extend the database
-def add_more_elements():
-    # This function would be used to add more elements to the database
-    # In a real application, you would add all 118 elements
-    pass
-
+# Entry point of the application
 if __name__ == "__main__":
     root = tk.Tk()
     app = PeriodicTableExplorer(root)
